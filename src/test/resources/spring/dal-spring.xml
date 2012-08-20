@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+	default-autowire="byName">
+
+	<bean id="dataSourceMaster" class="com.jolbox.bonecp.BoneCPDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl">
+			<value>${demo.datasource.master.jdbcUrl}</value>
+		</property>
+		<property name="username" value="${demo.datasource.master.username}" />
+		<property name="password" value="${demo.datasource.master.password}" />
+		<property name="idleConnectionTestPeriodInMinutes" value="5" />
+		<property name="idleMaxAgeInMinutes" value="30" />
+		<property name="maxConnectionsPerPartition" value="30" />
+		<property name="minConnectionsPerPartition" value="5" />
+		<property name="partitionCount" value="2" />
+		<property name="acquireIncrement" value="5" />
+		<property name="statementsCacheSize" value="150" />
+		<property name="releaseHelperThreads" value="8" />
+		<property name="connectionTestStatement" value="select 1 from dual" />
+	</bean>
+	
+	<bean id="dataSourceSlave" class="com.jolbox.bonecp.BoneCPDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl">
+			<value>${demo.datasource.slave.jdbcUrl}</value>
+		</property>
+		<property name="username" value="${demo.datasource.slave.username}" />
+		<property name="password" value="${demo.datasource.slave.password}" />
+		<property name="idleConnectionTestPeriodInMinutes" value="5" />
+		<property name="idleMaxAgeInMinutes" value="30" />
+		<property name="maxConnectionsPerPartition" value="30" />
+		<property name="minConnectionsPerPartition" value="5" />
+		<property name="partitionCount" value="2" />
+		<property name="acquireIncrement" value="5" />
+		<property name="statementsCacheSize" value="150" />
+		<property name="releaseHelperThreads" value="8" />
+		<property name="connectionTestStatement" value="select 1 from dual" />
+	</bean>
+	<bean id="demoSqlSessionFactory"
+		class="org.summercool.mybatis.spring.support.SqlSessionFactoryBean">
+		<property name="mainDataSource" ref="dataSourceMaster" />
+		<property name="shardDataSourceList">
+			<util:list>
+				<ref bean="dataSourceSlave" />
+			</util:list>
+		</property>
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mybatis/user-mapper.xml</value>
+			</array>
+		</property>
+		<property name="shardStrategy">
+			<map>
+				<entry key="Shard-User">
+					<value>org.summercool.mybatis.demo.shard.UserShardStrategy</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="userDao" class="org.summercool.mybatis.demo.dao.impl.UserDaoImpl">
+		<property name="sqlSessionFactory" ref="demoSqlSessionFactory"/>
+	</bean>
+</beans>

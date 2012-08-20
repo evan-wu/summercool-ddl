@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NS-User">
+
+	<insert id="insertUser" parameterType="org.summercool.mybatis.demo.dao.entity.UserEntity">
+		insert into $[user]$(
+			id,
+			name
+		) values (
+			#{id},
+			#{name}
+		)
+	</insert>
+</mapper>
