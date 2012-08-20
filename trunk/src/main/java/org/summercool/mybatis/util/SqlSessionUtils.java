@@ -21,13 +21,13 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
  */
 public final class SqlSessionUtils {
 
-	private static final Log logger = LogFactory.getLog(SqlSessionUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(SqlSessionUtils.class);
 
 	/**
 	 * This class can't be instantiated, exposes static utility methods only.
