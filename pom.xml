@@ -17,7 +17,7 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
 		</dependency>
-		
+
 		<!-- test dependency -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -39,7 +39,7 @@
 			<version>0.7.1.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- aspectj -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -47,6 +47,21 @@
 			<version>1.6.1</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>0.9.29</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>0.9.29</version>
+			<scope>test</scope>
+		</dependency>
+
 
 		<!-- junit -->
 		<dependency>

@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.util.Properties;
 
 import org.apache.ibatis.executor.statement.StatementHandler;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.summercool.mybatis.converter.SqlConverter;
 import org.summercool.mybatis.util.ReflectionUtils;
 
@@ -25,7 +25,7 @@ import org.summercool.mybatis.util.ReflectionUtils;
 @Intercepts({ @Signature(type = StatementHandler.class, method = "prepare", args = { Connection.class }) })
 public class ShardPlugin implements Interceptor {
 
-	private static final Log log = LogFactory.getLog(ShardPlugin.class);
+	private static final Logger log = LoggerFactory.getLogger(ShardPlugin.class);
 
 	private SqlConverter sqlConverter;
 

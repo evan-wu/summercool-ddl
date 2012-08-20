@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -32,6 +34,8 @@ import org.summercool.mybatis.util.ReflectionUtils;
 public class MultiDataSourceTransactionManager extends AbstractPlatformTransactionManager implements
 		ResourceTransactionManager, InitializingBean, BeanFactoryPostProcessor {
 	private static final long serialVersionUID = -5155071464588415023L;
+	private static final Logger logger = LoggerFactory.getLogger(MultiDataSourceTransactionManager.class);
+	
 	private Class<?> replaceAdviceClass = TransactionInterceptor.class;
 	private Class<?> newAdviceClass = ExtTransactionInterceptor.class;
 	private AtomicBoolean replaced = new AtomicBoolean();

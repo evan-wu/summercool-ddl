@@ -7,20 +7,20 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReflectionUtils {
 
-	private static final Log logger = LogFactory.getLog(ReflectionUtils.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(ReflectionUtils.class);
+
 	/**
 	 * 直接设置对象属性值,无视private/protected修饰符,不经过setter函数.
 	 */
 	public static void setFieldValue(final Object object, final String fieldName, final Object value) {
 		Field field = getDeclaredField(object, fieldName);
 
-		if (field == null){
+		if (field == null) {
 			throw new IllegalArgumentException("Could not find field [" + fieldName + "] on target [" + object + "]");
 		}
 		makeAccessible(field);
@@ -31,14 +31,14 @@ public class ReflectionUtils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 直接读取对象属性值,无视private/protected修饰符,不经过getter函数.
 	 */
 	public static Object getFieldValue(final Object object, final String fieldName) {
 		Field field = getDeclaredField(object, fieldName);
 
-		if (field == null){
+		if (field == null) {
 			throw new IllegalArgumentException("Could not find field [" + fieldName + "] on target [" + object + "]");
 		}
 		makeAccessible(field);
@@ -47,7 +47,7 @@ public class ReflectionUtils {
 		try {
 			result = field.get(object);
 		} catch (IllegalAccessException e) {
-			
+
 		}
 		return result;
 	}
@@ -58,7 +58,7 @@ public class ReflectionUtils {
 	public static Object invokeMethod(final Object object, final String methodName, final Class<?>[] parameterTypes,
 			final Object[] parameters) throws InvocationTargetException {
 		Method method = getDeclaredMethod(object, methodName, parameterTypes);
-		if (method == null){
+		if (method == null) {
 			throw new IllegalArgumentException("Could not find method [" + methodName + "] on target [" + object + "]");
 		}
 		method.setAccessible(true);
@@ -74,8 +74,9 @@ public class ReflectionUtils {
 	/**
 	 * 循环向上转型,获取对象的DeclaredField.
 	 */
-	protected static Field getDeclaredField(final Object object, final String fieldName) {		
-		for (Class<?> superClass = object.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
+	protected static Field getDeclaredField(final Object object, final String fieldName) {
+		for (Class<?> superClass = object.getClass(); superClass != Object.class; superClass = superClass
+				.getSuperclass()) {
 			try {
 				return superClass.getDeclaredField(fieldName);
 			} catch (NoSuchFieldException e) {
@@ -97,7 +98,8 @@ public class ReflectionUtils {
 	 * 循环向上转型,获取对象的DeclaredMethod.
 	 */
 	protected static Method getDeclaredMethod(Object object, String methodName, Class<?>[] parameterTypes) {
-		for (Class<?> superClass = object.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
+		for (Class<?> superClass = object.getClass(); superClass != Object.class; superClass = superClass
+				.getSuperclass()) {
 			try {
 				return superClass.getDeclaredMethod(methodName, parameterTypes);
 			} catch (NoSuchMethodException e) {
@@ -107,11 +109,10 @@ public class ReflectionUtils {
 	}
 
 	/**
-	 * 通过反射,获得Class定义中声明的父类的泛型参数的类型.
-	 * eg.
-	 * public UserDao extends HibernateDao<User>
-	 *
-	 * @param clazz The class to introspect
+	 * 通过反射,获得Class定义中声明的父类的泛型参数的类型. eg. public UserDao extends HibernateDao<User>
+	 * 
+	 * @param clazz
+	 *        The class to introspect
 	 * @return the first generic declaration, or Object.class if cannot be determined
 	 */
 	@SuppressWarnings("unchecked")
@@ -120,11 +121,10 @@ public class ReflectionUtils {
 	}
 
 	/**
-	 * 通过反射,获得Class定义中声明的父类的泛型参数的类型.
-	 * eg.
-	 * public UserDao extends HibernateDao<User>
-	 *
-	 * @param clazz The class to introspect
+	 * 通过反射,获得Class定义中声明的父类的泛型参数的类型. eg. public UserDao extends HibernateDao<User>
+	 * 
+	 * @param clazz
+	 *        The class to introspect
 	 * @return the first generic declaration, or Object.class if cannot be determined
 	 */
 	public static Class<?> getSuperClassGenricType(final Class<?> clazz, final int index) {
@@ -139,7 +139,8 @@ public class ReflectionUtils {
 		Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
 
 		if (index >= params.length || index < 0) {
-			logger.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: " + params.length);
+			logger.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: "
+					+ params.length);
 			return Object.class;
 		}
 		if (!(params[index] instanceof Class)) {
@@ -150,12 +151,12 @@ public class ReflectionUtils {
 		return (Class<?>) params[index];
 	}
 
-	
 	/**
 	 * 将反射时的checked exception转换为unchecked exception.
 	 */
 	public static IllegalArgumentException convertToUncheckedException(Exception e) {
-		if (e instanceof IllegalAccessException || e instanceof IllegalArgumentException || e instanceof NoSuchMethodException) {
+		if (e instanceof IllegalAccessException || e instanceof IllegalArgumentException
+				|| e instanceof NoSuchMethodException) {
 			return new IllegalArgumentException("Refelction Exception.", e);
 		} else {
 			return new IllegalArgumentException(e);
