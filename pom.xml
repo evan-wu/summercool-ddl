@@ -4,6 +4,47 @@
 	<groupId>org.summercool</groupId>
 	<artifactId>summercool-ddl</artifactId>
 	<version>1.0</version>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>utf-8</encoding>
+				</configuration>
+				<version>2.3.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>net.ju-n.maven.plugins</groupId>
+				<artifactId>maven-checksum-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>artifacts</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<xmlSummary>true</xmlSummary>
+					<xmlSummaryFile>artifacts-checksums.xml</xmlSummaryFile>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 		<dependency>
