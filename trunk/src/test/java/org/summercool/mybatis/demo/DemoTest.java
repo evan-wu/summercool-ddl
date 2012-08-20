@@ -22,7 +22,11 @@ public class DemoTest {
 	@Test
 	public void test_add() {
 		UserService userService = appCtx.getBean("userService", UserService.class);
-		userService.testAddUsers();
+		try {
+			userService.testAddUsers();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
