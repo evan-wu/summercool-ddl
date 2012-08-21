@@ -17,44 +17,41 @@ import org.summercool.mybatis.ShardParam;
  */
 public abstract class ShardStrategy {
 
-	private DataSource mainDataSource;
-
-	private Map<String, DataSource> shardDataSources;
-
-	private String sql;
-
-	private ShardParam shardParam;
+	private static final ThreadLocal<DataSource> mainDataSource = new ThreadLocal<DataSource>();
+	private static final ThreadLocal<Map<String, DataSource>> shardDataSources = new ThreadLocal<Map<String,DataSource>>();
+	private static final ThreadLocal<String> sql = new ThreadLocal<String>();
+	private static final ThreadLocal<ShardParam> shardParam= new ThreadLocal<ShardParam>();
 
 	public DataSource getMainDataSource() {
-		return mainDataSource;
+		return mainDataSource.get();
 	}
 
 	public void setMainDataSource(DataSource mainDataSource) {
-		this.mainDataSource = mainDataSource;
+		ShardStrategy.mainDataSource.set(mainDataSource);
 	}
 
 	public Map<String, DataSource> getShardDataSources() {
-		return shardDataSources;
+		return shardDataSources.get();
 	}
 
 	public void setShardDataSources(Map<String, DataSource> shardDataSources) {
-		this.shardDataSources = shardDataSources;
+		ShardStrategy.shardDataSources.set(shardDataSources);
 	}
 
 	public String getSql() {
-		return sql;
+		return sql.get();
 	}
 
 	public void setSql(String sql) {
-		this.sql = sql;
+		ShardStrategy.sql.set(sql);
 	}
 
 	public ShardParam getShardParam() {
-		return shardParam;
+		return shardParam.get();
 	}
 
 	public void setShardParam(ShardParam shardParam) {
-		this.shardParam = shardParam;
+		ShardStrategy.shardParam.set(shardParam);
 	}
 
 	public abstract DataSource getTargetDataSource();
