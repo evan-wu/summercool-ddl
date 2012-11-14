@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.summercool</groupId>
 	<artifactId>summercool-ddl</artifactId>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	
 	<build>
 		<plugins>
