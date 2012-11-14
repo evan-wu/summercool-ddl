@@ -65,24 +65,37 @@ public abstract class SqlSessionDaoSupport implements InitializingBean {
 	}
 
 	private class SessionHandler implements InvocationHandler {
-		
+
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			try {
+				// 默认DataSource为MainDataSource
+				DataSource targetDS = sqlSessionFactoryBean.getMainDataSource();
+
 				//
 				if (args == null || args.length == 0) {
+					// 准备事务
+					prepareTx(targetDS);
+					//
 					return method.invoke(dataSourceMap.get(sqlSessionFactoryBean.getMainDataSource()), args);
 				}
 				if (!(args[0] instanceof String)) {
+					// 准备事务
+					prepareTx(targetDS);
+					//
 					return method.invoke(dataSourceMap.get(sqlSessionFactoryBean.getMainDataSource()), args);
 				}
 				ShardParam shardParam = (args.length > 1 && args[1] instanceof ShardParam) ? (ShardParam) args[1]
 						: null;
 				if (shardParam == null) {
+					// 准备事务
+					prepareTx(targetDS);
+					//
 					return method.invoke(dataSourceMap.get(sqlSessionFactoryBean.getMainDataSource()), args);
 				} else {
 					args[1] = shardParam.getParams();
 				}
+				
 				//
 				String statement;
 				String shardStrategyName;
@@ -106,25 +119,16 @@ public abstract class SqlSessionDaoSupport implements InitializingBean {
 				shardStrategy.setSql(boundSql.getSql());
 				//
 				StrategyHolder.setShardStrategy(shardStrategy);
-				//
-				DataSource targetDS = shardStrategy.getTargetDataSource();
+				// 重新指定目标DataSource
+				targetDS = shardStrategy.getTargetDataSource();
 				SqlSessionTemplate sqlSessionTemplate = null;
 				if (targetDS == null || (sqlSessionTemplate = dataSourceMap.get(targetDS)) == null) {
 					targetDS = sqlSessionFactoryBean.getMainDataSource();
 					sqlSessionTemplate = dataSourceMap.get(targetDS);
 				}
 
-				//
-				TransactionHolder.setDataSource(targetDS);
-
-				// for transaction
-				TransactionInfoWrap txInfo = TransactionHolder.getTransactionInfo();
-				if (txInfo != null) {
-					TransactionAttribute attr = txInfo.getTransactionAttribute();
-					if (attr != null) {
-						createTxIfAbsent(targetDS, txInfo);
-					}
-				}
+				// 准备事务
+				prepareTx(targetDS);
 
 				return method.invoke(sqlSessionTemplate, args);
 			} finally {
@@ -132,6 +136,31 @@ public abstract class SqlSessionDaoSupport implements InitializingBean {
 			}
 		}
 
+		/**
+		 * 、 准备事务
+		 * 
+		 * @param targetDS
+		 */
+		private void prepareTx(DataSource targetDS) {
+			//
+			TransactionHolder.setDataSource(targetDS);
+
+			// for transaction
+			TransactionInfoWrap txInfo = TransactionHolder.getTransactionInfo();
+			if (txInfo != null) {
+				TransactionAttribute attr = txInfo.getTransactionAttribute();
+				if (attr != null) {
+					createTxIfAbsent(targetDS, txInfo);
+				}
+			}
+		}
+
+		/**
+		 * 如果不存在则创建事务
+		 * 
+		 * @param targetDS
+		 * @param txInfo
+		 */
 		private void createTxIfAbsent(DataSource targetDS, TransactionInfoWrap txInfo) {
 			Map<DataSource, LinkedList<TransactionInfoWrap>> txTree = TransactionHolder.getTxTree();
 			if (txTree == null || !txTree.containsKey(targetDS)) {
@@ -142,7 +171,8 @@ public abstract class SqlSessionDaoSupport implements InitializingBean {
 		private void createTx(DataSource targetDS, TransactionInfoWrap txInfo) {
 			TransactionStatus txStatus = txInfo.getTransactionManager()
 					.getTransaction(txInfo.getTransactionAttribute());
-			// txStatus = new TransactionStatusWrap((DefaultTransactionStatus) txStatus);
+			// txStatus = new TransactionStatusWrap((DefaultTransactionStatus)
+			// txStatus);
 			TransactionHolder.addStatusDS(txStatus, targetDS);
 			//
 			TransactionInfoWrap txInfoCopy = txInfo.newCopy();
