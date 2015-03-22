@@ -1,0 +1,1 @@
+基于mybatis的分表分库框架，事务由Spring拖管
